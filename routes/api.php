@@ -15,19 +15,16 @@ use App\Http\Controllers\StudentsController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+/* Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+ */
 
-Route::prefix('students')->group(function(){
+Route::prefix('students')->group(function () {
 
-Route::get('', [StudentsController::class, 'getAllStudents']);
-Route::get('/{id}', [StudentsController::class, 'getStudent']);
-Route::post('',[StudentsController::class, 'createStudent']);
-Route::put('/{id}', [StudentsController::class, 'updateStudent']);
-Route::delete('/{id}',[StudentsController::class, 'deleteStudent']);
-
+    Route::get('/', [StudentsController::class, 'index']);
+    Route::get('/{id}', [StudentsController::class, 'show']);
+    Route::post('/create', [StudentsController::class, 'store']);
+    Route::put('/{id}', [StudentsController::class, 'update']);
+    Route::delete('/{id}', [StudentsController::class, 'destroy']);
 });
-
-
-

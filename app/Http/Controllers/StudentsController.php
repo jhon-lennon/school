@@ -2,32 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUpdateStudent;
 use Illuminate\Http\Request;
 use App\Models\Students;
+use App\Services\StudentService;
+use DateTime;
+use PHPUnit\Framework\MockObject\Builder\Stub;
 
 class StudentsController extends Controller
 {
-    public function getAllStudents()
+    public function index()
     {
 
         $students = Students::get()->toJson(JSON_PRETTY_PRINT);
         return response($students, 200);
     }
 
-    public function createStudent(Request $request)
+ 
+    public function store(StoreUpdateStudent $request, StudentService $studentService)
     {
-
-        $student = new Students();
-        $student->name = $request->name;
-        $student->course = $request->course;
-        $student->save();
-
+        $studentService->createStudent($request->validated());
         return response()->json([
             "message" => "student record created"
-        ], 201);
+        ], 200);
     }
 
-    public function getStudent($id)
+    public function show($id)
     {
 
         if (students::where('id', $id)->exists()) {
@@ -40,7 +40,7 @@ class StudentsController extends Controller
         }
     }
 
-    public function updateStudent(Request $request, $id)
+    public function update(Request $request, $id)
     {
 
         if (Students::where('id', $id)->exists()) {
@@ -59,7 +59,7 @@ class StudentsController extends Controller
         }
     }
 
-    public function deleteStudent($id)
+    public function destroy($id)
     {
         if (Students::where('id', $id)->exists()) {
             $student = Students::find($id);
