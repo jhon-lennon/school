@@ -3,25 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUpdateStudent;
-use Illuminate\Http\Request;
-use App\Models\Students;
 use App\Services\StudentService;
-use DateTime;
-use PHPUnit\Framework\MockObject\Builder\Stub;
 
 class StudentsController extends Controller
 {
+    public function __construct(private StudentService $studentService)
+    {
+    }
+
     public function index()
     {
-
-        $students = Students::get()->toJson(JSON_PRETTY_PRINT);
+        $students =  $this->studentService->getAllStudents();
         return response($students, 200);
     }
 
- 
-    public function store(StoreUpdateStudent $request, StudentService $studentService)
+    public function store(StoreUpdateStudent $request,)
     {
-        $studentService->createStudent($request->validated());
+        $this->studentService->createStudent($request->validated());
         return response()->json([
             "message" => "student record created"
         ], 200);
@@ -29,26 +27,22 @@ class StudentsController extends Controller
 
     public function show($id)
     {
+        $student = $this->studentService->showStudent($id);
 
-        if (students::where('id', $id)->exists()) {
-            $student = Students::where('id', $id)->get()->toJson(JSON_PRETTY_PRINT);
+        if ($student) {
             return response($student, 200);
         } else {
             return response()->json([
                 "message" => "Student not found"
             ], 404);
-        }
+        };
     }
 
-    public function update(Request $request, $id)
+    public function update(StoreUpdateStudent $request, $id)
     {
+        $student = $this->studentService->updateStudent($id, $request);
 
-        if (Students::where('id', $id)->exists()) {
-            $student = Students::find($id);
-            $student->name = is_null($request->name) ? $student->name : $request->name;
-            $student->course = is_null($request->course) ? $student->course : $request->course;
-            $student->save();
-
+        if ($student) {
             return response()->json([
                 "message" => "records updated successfully"
             ], 200);
@@ -61,15 +55,13 @@ class StudentsController extends Controller
 
     public function destroy($id)
     {
-        if (Students::where('id', $id)->exists()) {
-            $student = Students::find($id);
-            $student->delete();
+        $student = $this->studentService->deleteStudent($id);
 
+        if ($student) {
             return response()->json([
                 "message" => "records deleted"
             ], 202);
         } else {
-
             return response()->json([
                 "message" => "Student not found"
             ], 404);
